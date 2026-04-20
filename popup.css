@@ -7,51 +7,53 @@
 body {
   width: 360px;
   font-family: 'Aptos', 'Trebuchet MS', 'Segoe UI', sans-serif;
-  background: radial-gradient(circle at 20% -20%, #1f365c 0%, #0f1a2f 48%, #0a1425 100%);
-  color: #e7edf9;
+  background: radial-gradient(circle at 20% -20%, #1f1f1f 0%, #101010 50%, #080808 100%);
+  color: #f1f1f1;
 }
 
 .container {
-  padding: 20px;
+  padding: 16px;
 }
 
 h1 {
-  font-size: 20px;
+  font-size: 18px;
+  line-height: 1.25;
   text-align: center;
-  margin-bottom: 6px;
-  letter-spacing: 0.2px;
-  color: #8fe9ff;
+  margin-bottom: 4px;
+  letter-spacing: 0.1px;
+  color: #f7f7f7;
 }
 
 .subtitle {
   text-align: center;
-  font-size: 12px;
-  color: #aac0df;
-  margin-bottom: 18px;
+  font-size: 11px;
+  color: #a7a7a7;
+  margin-bottom: 14px;
+  line-height: 1.35;
 }
 
 .toggle-row {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  margin-bottom: 16px;
-  padding: 10px 12px;
-  border: 1px solid #283d5e;
-  border-radius: 10px;
-  background: rgba(11, 25, 46, 0.68);
+  gap: 10px;
+  margin-bottom: 12px;
+  padding: 8px 10px;
+  border: 1px solid #2b2b2b;
+  border-radius: 8px;
+  background: rgba(18, 18, 18, 0.95);
 }
 
 .toggle-label {
-  font-size: 12px;
-  color: #b7c8e2;
+  font-size: 11px;
+  color: #c9c9c9;
   font-weight: 600;
 }
 
 .switch {
   position: relative;
-  width: 50px;
-  height: 26px;
+  width: 46px;
+  height: 24px;
 }
 
 .switch input {
@@ -64,16 +66,16 @@ h1 {
   position: absolute;
   cursor: pointer;
   inset: 0;
-  background: #405069;
-  border-radius: 26px;
+  background: #303030;
+  border-radius: 24px;
   transition: 0.3s;
 }
 
 .slider::before {
   content: "";
   position: absolute;
-  height: 20px;
-  width: 20px;
+  height: 18px;
+  width: 18px;
   left: 3px;
   bottom: 3px;
   background: white;
@@ -82,96 +84,97 @@ h1 {
 }
 
 .switch input:checked + .slider {
-  background: #3ec9f5;
+  background: #d8d8d8;
 }
 
 .switch input:checked + .slider::before {
-  transform: translateX(24px);
+  transform: translateX(22px);
+  background: #101010;
 }
 
 .status {
   font-weight: 700;
-  font-size: 12px;
+  font-size: 11px;
   letter-spacing: 1px;
 }
 
-.status.on { color: #7be4ff; }
-.status.off { color: #ff4757; }
+.status.on { color: #f1f1f1; }
+.status.off { color: #9c9c9c; }
 
 .control-group {
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .control-group label {
   display: block;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
-  margin-bottom: 6px;
-  color: #cddaf0;
+  margin-bottom: 4px;
+  color: #d7d7d7;
 }
 
 .control-group label span {
-  color: #8fe9ff;
+  color: #f7f7f7;
   font-weight: 700;
 }
 
 .control-group select {
   width: 100%;
-  padding: 10px 12px;
-  border-radius: 8px;
-  border: 1px solid #2d4568;
-  background: rgba(15, 30, 54, 0.9);
-  color: #e7edf9;
-  font-size: 13px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #343434;
+  background: #111111;
+  color: #f0f0f0;
+  font-size: 12px;
   cursor: pointer;
 }
 
 .control-group select:focus {
   outline: none;
-  border-color: #64d7ff;
-  box-shadow: 0 0 0 2px rgba(100, 215, 255, 0.25);
+  border-color: #6a6a6a;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.14);
 }
 
 .voice-description {
-  margin-top: 8px;
-  font-size: 11px;
-  color: #9bb0cf;
-  line-height: 1.4;
+  margin-top: 6px;
+  font-size: 10px;
+  color: #9a9a9a;
+  line-height: 1.35;
 }
 
 input[type="range"] {
   -webkit-appearance: none;
   width: 100%;
-  height: 6px;
-  border-radius: 3px;
-  background: #2f425e;
+  height: 4px;
+  border-radius: 2px;
+  background: #2d2d2d;
   outline: none;
 }
 
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
-  background: #7be4ff;
+  background: #f2f2f2;
   cursor: pointer;
-  box-shadow: 0 0 8px rgba(123, 228, 255, 0.45);
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
 }
 
 .range-labels {
   display: flex;
   justify-content: space-between;
-  font-size: 10px;
-  color: #7992b6;
+  font-size: 9px;
+  color: #7e7e7e;
   margin-top: 2px;
 }
 
 .advanced-panel {
-  background: rgba(13, 28, 51, 0.84);
-  border: 1px solid #2a4267;
-  border-radius: 8px;
-  padding: 14px;
-  margin-bottom: 14px;
+  background: #111111;
+  border: 1px solid #313131;
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 12px;
   transition: all 0.3s ease;
 }
 
@@ -180,23 +183,23 @@ input[type="range"]::-webkit-slider-thumb {
 }
 
 .advanced-header {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
-  color: #8fe9ff;
-  margin-bottom: 12px;
+  color: #f6f6f6;
+  margin-bottom: 10px;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.8px;
 }
 
 .button-row {
-  margin: 16px 0;
+  margin: 12px 0;
 }
 
 .btn {
-  padding: 10px 16px;
+  padding: 9px 14px;
   border: none;
-  border-radius: 8px;
-  font-size: 14px;
+  border-radius: 6px;
+  font-size: 13px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
@@ -207,9 +210,9 @@ input[type="range"]::-webkit-slider-thumb {
 }
 
 .btn.primary {
-  background: linear-gradient(90deg, #56c6f0, #91e9ff);
-  color: #0b1a31;
-  box-shadow: 0 10px 22px rgba(72, 194, 240, 0.24);
+  background: linear-gradient(90deg, #dedede, #f5f5f5);
+  color: #0f0f0f;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.34);
 }
 
 .btn.primary:hover {
@@ -217,51 +220,10 @@ input[type="range"]::-webkit-slider-thumb {
   transform: translateY(-1px);
 }
 
-.meters {
-  margin: 12px 0;
-}
-
-.meter-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 6px;
-}
-
-.meter-label {
-  font-size: 10px;
-  width: 42px;
-  text-align: right;
-  color: #94a8c6;
-}
-
-.meter-bar {
-  flex: 1;
-  height: 8px;
-  background: #223552;
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.meter-fill {
-  height: 100%;
-  width: 0%;
-  border-radius: 4px;
-  transition: width 0.1s;
-}
-
-.meter-fill.input {
-  background: linear-gradient(90deg, #4ac8f7, #74f4dd);
-}
-
-.meter-fill.output {
-  background: linear-gradient(90deg, #ff7676, #f9c06f);
-}
-
 .info {
-  font-size: 11px;
-  color: #92a6c6;
+  font-size: 10px;
+  color: #8e8e8e;
   text-align: center;
-  line-height: 1.4;
-  margin-top: 10px;
+  line-height: 1.35;
+  margin-top: 8px;
 }

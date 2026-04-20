@@ -15,6 +15,7 @@ class VoiceAnonymizerProcessor extends AudioWorkletProcessor {
     this.enabled = true;
     this.pitchFactor = 1.08;       // >1 = higher pitch, <1 = lower
     this.noiseLevel = 0.0012;      // white noise amplitude
+    this.micGain = 1.0;            // input volume multiplier
     this.tremoloRate = 0.0;        // Hz
     this.tremoloDepth = 0.0;       // 0-1
     this.formantShift = 1.18;      // formant region shift multiplier
@@ -42,6 +43,7 @@ class VoiceAnonymizerProcessor extends AudioWorkletProcessor {
       if (d.enabled !== undefined)      this.enabled = d.enabled;
       if (d.pitchFactor !== undefined)   this.pitchFactor = d.pitchFactor;
       if (d.noiseLevel !== undefined)    this.noiseLevel = d.noiseLevel;
+      if (d.micGain !== undefined)       this.micGain = Math.max(0, Math.min(2, d.micGain));
       if (d.tremoloRate !== undefined)   this.tremoloRate = d.tremoloRate;
       if (d.tremoloDepth !== undefined)  this.tremoloDepth = d.tremoloDepth;
       if (d.formantShift !== undefined)  this.formantShift = d.formantShift;
@@ -115,7 +117,7 @@ class VoiceAnonymizerProcessor extends AudioWorkletProcessor {
 
     for (let i = 0; i < input.length; i++) {
       // ── 1. Write input to circular delay buffer ──
-      this.buf[this.wp] = input[i];
+      this.buf[this.wp] = input[i] * this.micGain;
 
       // ── 2. Pitch Shifting (dual-tap with Hann crossfade) ──
       this.offset1 += speed;

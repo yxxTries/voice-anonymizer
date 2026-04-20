@@ -11,6 +11,7 @@ chrome.runtime.onInstalled.addListener(() => {
       pitchFactor: 1.08,
       formantShift: 1.18,
       noiseLevel: 0.0012,
+      micGain: 1,
       tremoloRate: 0,
       tremoloDepth: 0,
       voiceStyle: 'balanced',

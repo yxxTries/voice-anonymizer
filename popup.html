@@ -32,6 +32,12 @@
       <p id="voiceDescription" class="voice-description">Natural cadence with clear consonants and anonymized timbre.</p>
     </div>
 
+    <div class="control-group">
+      <label>Mic Input Volume: <span id="micGainValue">100%</span></label>
+      <input type="range" id="micGainSlider" min="0" max="2" step="0.01" value="1">
+      <div class="range-labels"><span>Mute</span><span>Boost</span></div>
+    </div>
+
     <!-- Advanced Settings (hidden by default) -->
     <div id="advancedPanel" class="advanced-panel hidden">
       <div class="advanced-header">Advanced Settings</div>
@@ -68,18 +74,6 @@
     <!-- Preview Button -->
     <div class="button-row">
       <button id="previewBtn" class="btn primary full">Open Voice Preview</button>
-    </div>
-
-    <!-- Audio Level Meters -->
-    <div class="meters">
-      <div class="meter-row">
-        <span class="meter-label">Input</span>
-        <div class="meter-bar"><div id="inputMeter" class="meter-fill input"></div></div>
-      </div>
-      <div class="meter-row">
-        <span class="meter-label">Output</span>
-        <div class="meter-bar"><div id="outputMeter" class="meter-fill output"></div></div>
-      </div>
     </div>
 
     <p class="info">When enabled, microphone audio is anonymized automatically on all sites.</p>
