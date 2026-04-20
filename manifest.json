@@ -1,0 +1,36 @@
+{
+  "manifest_version": 3,
+  "name": "Voice Anonymizer",
+  "version": "1.0.0",
+  "description": "Anonymize your microphone audio in real-time.",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "scripting"
+  ],
+  "host_permissions": ["<all_urls>"],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "injected.js",
+        "audio-processor.js",
+        "preview.html",
+        "preview.js"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}
