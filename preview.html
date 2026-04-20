@@ -18,27 +18,42 @@
       border-radius: 16px;
       padding: 40px;
       text-align: center;
-      max-width: 500px;
+      max-width: 520px;
+      width: 100%;
       box-shadow: 0 8px 32px rgba(0,0,0,0.3);
     }
     h1 { color: #00d2ff; margin-bottom: 8px; font-size: 24px; }
     .sub { color: #888; font-size: 13px; margin-bottom: 24px; }
     .status {
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 700;
-      margin: 20px 0;
+      margin: 16px 0;
       padding: 12px 24px;
       border-radius: 8px;
     }
-    .status.listening {
-      background: rgba(0, 210, 255, 0.15);
+    .status.ready {
+      background: rgba(0, 210, 255, 0.1);
       color: #00d2ff;
+    }
+    .status.recording {
+      background: rgba(255, 71, 87, 0.15);
+      color: #ff4757;
+      animation: pulse 1s infinite;
+    }
+    .status.done {
+      background: rgba(0, 255, 136, 0.1);
+      color: #00ff88;
     }
     .status.error {
       background: rgba(255, 71, 87, 0.15);
       color: #ff4757;
     }
-    .meters { margin: 20px 0; }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+
+    .meters { margin: 16px 0; }
     .meter-row {
       display: flex; align-items: center; gap: 10px;
       margin-bottom: 8px; justify-content: center;
@@ -50,33 +65,108 @@
     }
     .meter-fill { height: 100%; width: 0%; border-radius: 5px; transition: width 0.1s; }
     .meter-fill.input { background: linear-gradient(90deg, #00d2ff, #00ff88); }
-    .meter-fill.output { background: linear-gradient(90deg, #ff6b6b, #ffa502); }
-    .tip { color: #555; font-size: 11px; margin-top: 16px; }
-    .stopbtn {
-      margin-top: 20px; padding: 10px 32px; border: none;
-      border-radius: 8px; background: #ff4757; color: white;
-      font-size: 14px; font-weight: 600; cursor: pointer;
+
+    .timer {
+      font-size: 32px;
+      font-weight: 700;
+      color: #fff;
+      margin: 16px 0;
+      font-variant-numeric: tabular-nums;
     }
-    .stopbtn:hover { background: #ee3344; }
+
+    .buttons {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin: 20px 0;
+    }
+    .btn {
+      padding: 12px 28px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn:hover { transform: scale(1.03); }
+    .btn:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
+    .btn.record { background: #ff4757; color: white; }
+    .btn.record:hover:not(:disabled) { background: #ee3344; }
+    .btn.stop { background: #666; color: white; }
+    .btn.play { background: #00d2ff; color: #1a1a2e; }
+    .btn.play:hover:not(:disabled) { background: #00b8e6; }
+    .btn.close { background: #333; color: #ccc; }
+    .btn.close:hover { background: #444; }
+
+    .playback-section {
+      display: none;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid #333;
+    }
+    .playback-section.visible { display: block; }
+    .playback-label {
+      font-size: 12px;
+      color: #888;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .playback-row {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 10px;
+    }
+    .btn.small {
+      padding: 8px 20px;
+      font-size: 13px;
+    }
+    .btn.original { background: #333; color: #ccc; }
+    .btn.original:hover:not(:disabled) { background: #444; }
+    .btn.disguised { background: #00d2ff; color: #1a1a2e; }
+    .btn.disguised:hover:not(:disabled) { background: #00b8e6; }
+    .btn.playing { outline: 2px solid #fff; outline-offset: 2px; }
+
+    .tip { color: #555; font-size: 11px; margin-top: 16px; }
   </style>
 </head>
 <body>
   <div class="card">
     <h1>🎙️ Voice Preview</h1>
-    <p class="sub">Speak into your mic — you'll hear your anonymized voice</p>
-    <div id="statusBox" class="status listening">⏳ Starting...</div>
+    <p class="sub">Record a clip, then compare your original vs disguised voice</p>
+
+    <div id="statusBox" class="status ready">🎤 Ready to record</div>
+
+    <div class="timer" id="timer">0:00</div>
+
     <div class="meters">
       <div class="meter-row">
-        <span class="meter-label">Your voice</span>
+        <span class="meter-label">Mic level</span>
         <div class="meter-bar"><div id="inMeter" class="meter-fill input"></div></div>
       </div>
-      <div class="meter-row">
-        <span class="meter-label">Disguised</span>
-        <div class="meter-bar"><div id="outMeter" class="meter-fill output"></div></div>
+    </div>
+
+    <div class="buttons">
+      <button class="btn record" id="recordBtn">⏺ Record</button>
+      <button class="btn stop" id="stopBtn" disabled>⏹ Stop</button>
+    </div>
+
+    <div class="playback-section" id="playbackSection">
+      <p class="playback-label">Listen to your recording</p>
+      <div class="playback-row">
+        <button class="btn small original" id="playOriginalBtn">🔊 Original</button>
+        <button class="btn small disguised" id="playDisguisedBtn">🎭 Disguised</button>
       </div>
     </div>
-    <p class="tip">🎧 Use headphones to avoid echo feedback</p>
-    <button class="stopbtn" id="stopBtn">⏹ Stop & Close</button>
+
+    <div class="buttons">
+      <button class="btn close" id="closeBtn">✕ Close</button>
+    </div>
+
+    <p class="tip">You can record multiple times. Each new recording replaces the last.</p>
   </div>
   <script src="preview.js"></script>
 </body>
