@@ -18,41 +18,61 @@ const tremoloRateSlider = document.getElementById('tremoloRateSlider');
 const tremoloRateValue = document.getElementById('tremoloRateValue');
 const tremoloDepthSlider = document.getElementById('tremoloDepthSlider');
 const tremoloDepthValue = document.getElementById('tremoloDepthValue');
+const voiceDescription = document.getElementById('voiceDescription');
 const previewBtn = document.getElementById('previewBtn');
 const inputMeter = document.getElementById('inputMeter');
 const outputMeter = document.getElementById('outputMeter');
 
 // ── Voice Styles ──
 const VOICES = {
-  natural1: {
-    pitch: 0.82,
-    formant: 0.88,
-    noise: 0.003,
+  balanced: {
+    pitch: 1.08,
+    formant: 1.18,
+    noise: 0.0012,
     tremoloRate: 0,
     tremoloDepth: 0,
+    description: 'Natural cadence with clear consonants and anonymized timbre.',
   },
-  natural2: {
-    pitch: 1.18,
-    formant: 1.12,
-    noise: 0.003,
+  warm: {
+    pitch: 0.94,
+    formant: 0.86,
+    noise: 0.0014,
+    tremoloRate: 0.4,
+    tremoloDepth: 0.01,
+    description: 'Softer and fuller tone while preserving transcript quality.',
+  },
+  bright: {
+    pitch: 1.16,
+    formant: 1.28,
+    noise: 0.001,
     tremoloRate: 0,
     tremoloDepth: 0,
+    description: 'Crisp high-frequency emphasis for strong intelligibility.',
   },
-  natural3: {
-    pitch: 0.90,
-    formant: 0.80,
-    noise: 0.004,
-    tremoloRate: 0.5,
-    tremoloDepth: 0.02,
-  },
-  natural4: {
-    pitch: 1.10,
-    formant: 1.20,
-    noise: 0.002,
-    tremoloRate: 0,
-    tremoloDepth: 0,
+  synthetic: {
+    pitch: 1.22,
+    formant: 1.34,
+    noise: 0.0018,
+    tremoloRate: 0.8,
+    tremoloDepth: 0.015,
+    description: 'Distinct from the original speaker with a neutral machine-like texture.',
   },
 };
+
+const DEFAULT_VOICE_STYLE = 'balanced';
+
+function getPreset(style) {
+  return VOICES[style] || VOICES[DEFAULT_VOICE_STYLE];
+}
+
+function updateVoiceDescription() {
+  if (!voiceDescription) return;
+  if (voiceStyle.value === 'custom') {
+    voiceDescription.textContent = 'Manual sliders let you tune your own anonymized profile.';
+    return;
+  }
+  voiceDescription.textContent = getPreset(voiceStyle.value).description;
+}
 
 // ── Gather current settings ──
 function getSettings() {
@@ -93,7 +113,7 @@ function updateDisplayValues() {
 
 // ── Apply a voice style to sliders ──
 function applyVoice(name) {
-  const v = VOICES[name];
+  const v = getPreset(name);
   if (!v) return;
   pitchSlider.value = v.pitch;
   formantSlider.value = v.formant;
@@ -101,6 +121,7 @@ function applyVoice(name) {
   tremoloRateSlider.value = v.tremoloRate;
   tremoloDepthSlider.value = v.tremoloDepth;
   updateDisplayValues();
+  updateVoiceDescription();
   saveSettings();
 }
 
@@ -132,8 +153,11 @@ enableToggle.addEventListener('change', () => {
 
 voiceStyle.addEventListener('change', () => {
   toggleAdvanced();
+  updateVoiceDescription();
   if (voiceStyle.value !== 'custom') {
     applyVoice(voiceStyle.value);
+  } else {
+    saveSettings();
   }
 });
 
@@ -148,20 +172,31 @@ previewBtn.addEventListener('click', startPreview);
 
 // ── Initialize ──
 chrome.storage.local.get('voiceAnonymizer', (result) => {
-  if (result.voiceAnonymizer) {
-    const s = result.voiceAnonymizer;
-    enableToggle.checked = s.enabled !== false;
-    pitchSlider.value = s.pitchFactor || 0.82;
-    formantSlider.value = s.formantShift || 0.88;
-    noiseSlider.value = s.noiseLevel || 0.003;
-    tremoloRateSlider.value = s.tremoloRate || 0;
-    tremoloDepthSlider.value = s.tremoloDepth || 0;
-    voiceStyle.value = s.voiceStyle || 'natural1';
+  const s = result.voiceAnonymizer || {};
+  const savedStyle = s.voiceStyle;
+  const isKnownStyle = savedStyle === 'custom' || !!VOICES[savedStyle];
+  const resolvedStyle = isKnownStyle ? savedStyle : DEFAULT_VOICE_STYLE;
+  const preset = getPreset(resolvedStyle);
+  const canUseStoredParams = isKnownStyle;
 
-    const on = enableToggle.checked;
-    statusLabel.textContent = on ? 'ACTIVE' : 'OFF';
-    statusLabel.className = `status ${on ? 'on' : 'off'}`;
-  }
+  enableToggle.checked = s.enabled !== false;
+  voiceStyle.value = resolvedStyle;
+
+  pitchSlider.value = canUseStoredParams && s.pitchFactor != null ? s.pitchFactor : preset.pitch;
+  formantSlider.value = canUseStoredParams && s.formantShift != null ? s.formantShift : preset.formant;
+  noiseSlider.value = canUseStoredParams && s.noiseLevel != null ? s.noiseLevel : preset.noise;
+  tremoloRateSlider.value = canUseStoredParams && s.tremoloRate != null ? s.tremoloRate : preset.tremoloRate;
+  tremoloDepthSlider.value = canUseStoredParams && s.tremoloDepth != null ? s.tremoloDepth : preset.tremoloDepth;
+
+  const on = enableToggle.checked;
+  statusLabel.textContent = on ? 'ACTIVE' : 'OFF';
+  statusLabel.className = `status ${on ? 'on' : 'off'}`;
+
   updateDisplayValues();
   toggleAdvanced();
+  updateVoiceDescription();
+
+  if (!result.voiceAnonymizer || !isKnownStyle) {
+    applyVoice(resolvedStyle);
+  }
 });

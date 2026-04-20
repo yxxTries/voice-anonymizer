@@ -11,17 +11,114 @@ let disguisedBlob = null;
 let timerInterval = null;
 let recordStartTime = 0;
 let currentlyPlaying = null;
+let isProcessingDisguise = false;
 
 // ── DOM ──
 const statusBox = document.getElementById('statusBox');
 const timerEl = document.getElementById('timer');
 const inMeter = document.getElementById('inMeter');
+const previewVoiceType = document.getElementById('previewVoiceType');
+const voiceHint = document.getElementById('voiceHint');
 const recordBtn = document.getElementById('recordBtn');
 const stopBtn = document.getElementById('stopBtn');
 const playbackSection = document.getElementById('playbackSection');
 const playOriginalBtn = document.getElementById('playOriginalBtn');
 const playDisguisedBtn = document.getElementById('playDisguisedBtn');
 const closeBtn = document.getElementById('closeBtn');
+
+const VOICES = {
+  balanced: {
+    pitchFactor: 1.08,
+    formantShift: 1.18,
+    noiseLevel: 0.0012,
+    tremoloRate: 0,
+    tremoloDepth: 0,
+    hint: 'Natural cadence with clear consonants and anonymized timbre.',
+  },
+  warm: {
+    pitchFactor: 0.94,
+    formantShift: 0.86,
+    noiseLevel: 0.0014,
+    tremoloRate: 0.4,
+    tremoloDepth: 0.01,
+    hint: 'Softer and fuller tone while preserving transcript quality.',
+  },
+  bright: {
+    pitchFactor: 1.16,
+    formantShift: 1.28,
+    noiseLevel: 0.001,
+    tremoloRate: 0,
+    tremoloDepth: 0,
+    hint: 'Crisp high-frequency emphasis for strong intelligibility.',
+  },
+  synthetic: {
+    pitchFactor: 1.22,
+    formantShift: 1.34,
+    noiseLevel: 0.0018,
+    tremoloRate: 0.8,
+    tremoloDepth: 0.015,
+    hint: 'Distinct from the original speaker with a neutral machine-like texture.',
+  },
+};
+
+const DEFAULT_VOICE_STYLE = 'balanced';
+
+function isKnownVoiceStyle(style) {
+  return style === 'custom' || !!VOICES[style];
+}
+
+function getVoicePreset(style) {
+  return VOICES[style] || VOICES[DEFAULT_VOICE_STYLE];
+}
+
+function updateVoiceHint() {
+  if (previewVoiceType.value === 'custom') {
+    voiceHint.textContent = 'Uses your custom slider values from the popup settings.';
+    return;
+  }
+  voiceHint.textContent = getVoicePreset(previewVoiceType.value).hint;
+}
+
+async function getStoredSettings() {
+  var result = await chrome.storage.local.get('voiceAnonymizer');
+  return result.voiceAnonymizer || {};
+}
+
+async function getPreviewProcessingSettings() {
+  var base = await getStoredSettings();
+  var style = previewVoiceType.value;
+
+  if (style === 'custom') {
+    var fallback = getVoicePreset(DEFAULT_VOICE_STYLE);
+    return {
+      ...base,
+      voiceStyle: 'custom',
+      pitchFactor: base.pitchFactor != null ? base.pitchFactor : fallback.pitchFactor,
+      formantShift: base.formantShift != null ? base.formantShift : fallback.formantShift,
+      noiseLevel: base.noiseLevel != null ? base.noiseLevel : fallback.noiseLevel,
+      tremoloRate: base.tremoloRate != null ? base.tremoloRate : fallback.tremoloRate,
+      tremoloDepth: base.tremoloDepth != null ? base.tremoloDepth : fallback.tremoloDepth,
+    };
+  }
+
+  return {
+    ...base,
+    ...getVoicePreset(style),
+    voiceStyle: style,
+  };
+}
+
+async function initializeVoicePicker() {
+  var settings = await getStoredSettings();
+  var styleFromPreview = settings.previewVoiceStyle;
+  var styleFromPopup = settings.voiceStyle;
+  var initialStyle = isKnownVoiceStyle(styleFromPreview)
+    ? styleFromPreview
+    : (isKnownVoiceStyle(styleFromPopup) ? styleFromPopup : DEFAULT_VOICE_STYLE);
+
+  previewVoiceType.value = initialStyle;
+  updateVoiceHint();
+}
 
 // ── Initialize mic ──
 async function initMic() {
@@ -35,11 +132,11 @@ async function initMic() {
     sourceNode.connect(inputAnalyser);
 
     updateMeter();
-    statusBox.textContent = '🎤 Ready to record';
+    statusBox.textContent = 'Ready to record.';
     statusBox.className = 'status ready';
   } catch (e) {
     statusBox.className = 'status error';
-    statusBox.textContent = '❌ ' + e.message;
+    statusBox.textContent = 'Error: ' + e.message;
     recordBtn.disabled = true;
   }
 }
@@ -99,29 +196,30 @@ function startRecording() {
 
   mediaRecorder.onstop = async function () {
     originalBlob = new Blob(recordedChunks, { type: 'audio/webm' });
-    statusBox.textContent = '🔄 Processing disguised version...';
+    statusBox.textContent = 'Processing anonymized version...';
     statusBox.className = 'status ready';
 
     try {
-      disguisedBlob = await createDisguisedVersion(originalBlob);
-      statusBox.textContent = '✅ Recording ready — listen below!';
+      var processingSettings = await getPreviewProcessingSettings();
+      disguisedBlob = await createDisguisedVersion(originalBlob, processingSettings);
+      statusBox.textContent = 'Recording is ready. Listen below.';
       statusBox.className = 'status done';
       playbackSection.classList.add('visible');
     } catch (e) {
-      statusBox.textContent = '❌ Processing failed: ' + e.message;
+      statusBox.textContent = 'Processing failed: ' + e.message;
       statusBox.className = 'status error';
       console.error(e);
     }
 
     recordBtn.disabled = false;
-    recordBtn.textContent = '⏺ Record Again';
+    recordBtn.textContent = 'Record Again';
     stopBtn.disabled = true;
   };
 
   mediaRecorder.start();
   startTimer();
 
-  statusBox.textContent = '🔴 Recording... speak now!';
+  statusBox.textContent = 'Recording. Speak now.';
   statusBox.className = 'status recording';
   recordBtn.disabled = true;
   stopBtn.disabled = false;
@@ -135,9 +233,8 @@ function stopRecording() {
 }
 
 // ── Create disguised version offline ──
-async function createDisguisedVersion(blob) {
-  var result = await chrome.storage.local.get('voiceAnonymizer');
-  var settings = result.voiceAnonymizer || {};
+async function createDisguisedVersion(blob, settings) {
+  var renderSettings = settings || (await getPreviewProcessingSettings());
 
   // Decode the original audio
   var arrayBuffer = await blob.arrayBuffer();
@@ -157,7 +254,7 @@ async function createDisguisedVersion(blob) {
   source.buffer = originalBuffer;
 
   var worklet = new AudioWorkletNode(offline, 'voice-anonymizer');
-  worklet.port.postMessage(settings);
+  worklet.port.postMessage(renderSettings);
 
   source.connect(worklet);
   worklet.connect(offline.destination);
@@ -255,6 +352,29 @@ function stopPlayback() {
   }
 }
 
+async function refreshDisguisedFromSelection() {
+  if (!originalBlob || isProcessingDisguise) return;
+
+  isProcessingDisguise = true;
+  stopPlayback();
+  statusBox.textContent = 'Applying selected preview voice...';
+  statusBox.className = 'status ready';
+
+  try {
+    var processingSettings = await getPreviewProcessingSettings();
+    disguisedBlob = await createDisguisedVersion(originalBlob, processingSettings);
+    statusBox.textContent = 'Updated anonymized preview is ready.';
+    statusBox.className = 'status done';
+    playbackSection.classList.add('visible');
+  } catch (e) {
+    statusBox.textContent = 'Unable to update preview voice: ' + e.message;
+    statusBox.className = 'status error';
+    console.error(e);
+  }
+
+  isProcessingDisguise = false;
+}
+
 // ── Event Listeners ──
 recordBtn.addEventListener('click', function () {
   stopPlayback();
@@ -277,6 +397,14 @@ playDisguisedBtn.addEventListener('click', function () {
   }
 });
 
+previewVoiceType.addEventListener('change', async function () {
+  updateVoiceHint();
+  var current = await getStoredSettings();
+  current.previewVoiceStyle = previewVoiceType.value;
+  chrome.storage.local.set({ voiceAnonymizer: current });
+  refreshDisguisedFromSelection();
+});
+
 closeBtn.addEventListener('click', function () {
   stopPlayback();
   stopRecording();
@@ -289,4 +417,9 @@ closeBtn.addEventListener('click', function () {
 });
 
 // ── Start ──
-initMic();
+async function initialize() {
+  await initializeVoicePicker();
+  await initMic();
+}
+
+initialize();

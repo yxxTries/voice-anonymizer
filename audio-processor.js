@@ -13,11 +13,11 @@ class VoiceAnonymizerProcessor extends AudioWorkletProcessor {
 
     // ── Default Parameters ──
     this.enabled = true;
-    this.pitchFactor = 1.45;       // >1 = higher pitch, <1 = lower
-    this.noiseLevel = 0.008;       // white noise amplitude
-    this.tremoloRate = 5.0;        // Hz
-    this.tremoloDepth = 0.15;      // 0–1
-    this.formantShift = 1.2;       // formant region shift multiplier
+    this.pitchFactor = 1.08;       // >1 = higher pitch, <1 = lower
+    this.noiseLevel = 0.0012;      // white noise amplitude
+    this.tremoloRate = 0.0;        // Hz
+    this.tremoloDepth = 0.0;       // 0-1
+    this.formantShift = 1.18;      // formant region shift multiplier
 
     // ── Pitch Shifter State ──
     this.bufSize = 16384;

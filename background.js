@@ -8,15 +8,16 @@ chrome.runtime.onInstalled.addListener(() => {
   chrome.storage.local.set({
     voiceAnonymizer: {
       enabled: true,
-      pitchFactor: 0.82,
-      formantShift: 0.88,
-      noiseLevel: 0.003,
+      pitchFactor: 1.08,
+      formantShift: 1.18,
+      noiseLevel: 0.0012,
       tremoloRate: 0,
       tremoloDepth: 0,
-      voiceStyle: 'natural1',
+      voiceStyle: 'balanced',
+      previewVoiceStyle: 'balanced',
     },
   });
-  console.log('[Voice Anonymizer] Installed with natural voice defaults.');
+  console.log('[Voice Anonymizer] Installed with balanced clear defaults.');
 });
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {

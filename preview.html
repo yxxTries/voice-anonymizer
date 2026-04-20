@@ -1,52 +1,107 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Voice Anonymizer — Preview</title>
+  <title>Voice Anonymizer - Preview</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      background: #1a1a2e;
-      color: #e0e0e0;
+      font-family: 'Aptos', 'Trebuchet MS', 'Segoe UI', sans-serif;
+      background:
+        radial-gradient(circle at 15% -20%, rgba(94, 176, 214, 0.35), transparent 45%),
+        radial-gradient(circle at 92% 10%, rgba(96, 127, 201, 0.25), transparent 32%),
+        linear-gradient(160deg, #071226, #0b1b35 48%, #081428);
+      color: #e9f2ff;
       display: flex;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
+      padding: 24px;
     }
     .card {
-      background: #16213e;
-      border-radius: 16px;
-      padding: 40px;
-      text-align: center;
-      max-width: 520px;
+      background: rgba(8, 22, 45, 0.86);
+      border: 1px solid rgba(119, 171, 228, 0.28);
+      border-radius: 18px;
+      padding: 32px;
+      text-align: left;
+      max-width: 640px;
       width: 100%;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+      box-shadow: 0 18px 48px rgba(0, 0, 0, 0.38);
+      backdrop-filter: blur(6px);
     }
-    h1 { color: #00d2ff; margin-bottom: 8px; font-size: 24px; }
-    .sub { color: #888; font-size: 13px; margin-bottom: 24px; }
+    h1 {
+      color: #9fe9ff;
+      margin-bottom: 8px;
+      font-size: 28px;
+      letter-spacing: 0.3px;
+      text-align: center;
+    }
+    .sub {
+      color: #b4c9e8;
+      font-size: 14px;
+      margin-bottom: 22px;
+      text-align: center;
+      line-height: 1.45;
+    }
+    .voice-picker {
+      background: rgba(11, 31, 60, 0.72);
+      border: 1px solid rgba(104, 151, 208, 0.3);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 16px;
+    }
+    .voice-picker label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: #bfd3f1;
+    }
+    .voice-picker select {
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid #2f4c77;
+      background: #0c203f;
+      color: #ebf3ff;
+      font-size: 14px;
+      padding: 10px 12px;
+    }
+    .voice-picker select:focus {
+      outline: none;
+      border-color: #84dbff;
+      box-shadow: 0 0 0 2px rgba(132, 219, 255, 0.22);
+    }
+    .voice-hint {
+      margin-top: 8px;
+      font-size: 12px;
+      color: #a9c1e5;
+      line-height: 1.4;
+    }
     .status {
       font-size: 16px;
       font-weight: 700;
       margin: 16px 0;
       padding: 12px 24px;
       border-radius: 8px;
+      text-align: center;
     }
     .status.ready {
-      background: rgba(0, 210, 255, 0.1);
-      color: #00d2ff;
+      background: rgba(74, 186, 255, 0.15);
+      color: #88ddff;
     }
     .status.recording {
-      background: rgba(255, 71, 87, 0.15);
-      color: #ff4757;
+      background: rgba(255, 97, 118, 0.16);
+      color: #ff8f9d;
       animation: pulse 1s infinite;
     }
     .status.done {
-      background: rgba(0, 255, 136, 0.1);
-      color: #00ff88;
+      background: rgba(119, 238, 184, 0.15);
+      color: #95efc2;
     }
     .status.error {
-      background: rgba(255, 71, 87, 0.15);
-      color: #ff4757;
+      background: rgba(255, 90, 110, 0.2);
+      color: #ff9eab;
     }
     @keyframes pulse {
       0%, 100% { opacity: 1; }
@@ -55,23 +110,29 @@
 
     .meters { margin: 16px 0; }
     .meter-row {
-      display: flex; align-items: center; gap: 10px;
-      margin-bottom: 8px; justify-content: center;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+      justify-content: center;
     }
-    .meter-label { font-size: 12px; width: 50px; text-align: right; color: #888; }
+    .meter-label { font-size: 12px; width: 80px; text-align: right; color: #b2c7e4; }
     .meter-bar {
-      width: 300px; height: 10px; background: #222;
+      width: min(100%, 390px);
+      height: 10px;
+      background: #1d3150;
       border-radius: 5px; overflow: hidden;
     }
     .meter-fill { height: 100%; width: 0%; border-radius: 5px; transition: width 0.1s; }
-    .meter-fill.input { background: linear-gradient(90deg, #00d2ff, #00ff88); }
+    .meter-fill.input { background: linear-gradient(90deg, #52c8ff, #6aeec7); }
 
     .timer {
       font-size: 32px;
       font-weight: 700;
-      color: #fff;
+      color: #eaf4ff;
       margin: 16px 0;
       font-variant-numeric: tabular-nums;
+      text-align: center;
     }
 
     .buttons {
@@ -90,29 +151,30 @@
       cursor: pointer;
       transition: all 0.2s;
     }
-    .btn:hover { transform: scale(1.03); }
+    .btn:hover { transform: translateY(-1px); }
     .btn:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
-    .btn.record { background: #ff4757; color: white; }
-    .btn.record:hover:not(:disabled) { background: #ee3344; }
-    .btn.stop { background: #666; color: white; }
-    .btn.play { background: #00d2ff; color: #1a1a2e; }
-    .btn.play:hover:not(:disabled) { background: #00b8e6; }
-    .btn.close { background: #333; color: #ccc; }
-    .btn.close:hover { background: #444; }
+    .btn.record { background: linear-gradient(90deg, #f0566b, #ff7588); color: white; }
+    .btn.record:hover:not(:disabled) { filter: brightness(1.04); }
+    .btn.stop { background: #51627f; color: white; }
+    .btn.play { background: linear-gradient(90deg, #54c7f3, #87e9ff); color: #0a1a31; }
+    .btn.play:hover:not(:disabled) { filter: brightness(1.03); }
+    .btn.close { background: #243a5c; color: #d2e2f9; }
+    .btn.close:hover { background: #2c4972; }
 
     .playback-section {
       display: none;
       margin-top: 20px;
       padding-top: 20px;
-      border-top: 1px solid #333;
+      border-top: 1px solid #2f466d;
     }
     .playback-section.visible { display: block; }
     .playback-label {
       font-size: 12px;
-      color: #888;
+      color: #b5c8e5;
       margin-bottom: 8px;
       text-transform: uppercase;
       letter-spacing: 1px;
+      text-align: center;
     }
     .playback-row {
       display: flex;
@@ -124,21 +186,55 @@
       padding: 8px 20px;
       font-size: 13px;
     }
-    .btn.original { background: #333; color: #ccc; }
-    .btn.original:hover:not(:disabled) { background: #444; }
-    .btn.disguised { background: #00d2ff; color: #1a1a2e; }
-    .btn.disguised:hover:not(:disabled) { background: #00b8e6; }
+    .btn.original { background: #274061; color: #d7e7ff; }
+    .btn.original:hover:not(:disabled) { background: #30517c; }
+    .btn.disguised { background: linear-gradient(90deg, #56caf5, #8deaff); color: #0a1b33; }
+    .btn.disguised:hover:not(:disabled) { filter: brightness(1.03); }
     .btn.playing { outline: 2px solid #fff; outline-offset: 2px; }
 
-    .tip { color: #555; font-size: 11px; margin-top: 16px; }
+    .tip {
+      color: #9bb2d4;
+      font-size: 11px;
+      margin-top: 16px;
+      text-align: center;
+      line-height: 1.4;
+    }
+
+    @media (max-width: 680px) {
+      .card {
+        padding: 24px 18px;
+      }
+      h1 {
+        font-size: 24px;
+      }
+      .buttons {
+        gap: 8px;
+      }
+      .btn {
+        flex: 1;
+        min-width: 120px;
+      }
+    }
   </style>
 </head>
 <body>
   <div class="card">
-    <h1>🎙️ Voice Preview</h1>
-    <p class="sub">Record a clip, then compare your original vs disguised voice</p>
+    <h1>Voice Preview</h1>
+    <p class="sub">Record a short clip and compare your original audio against the anonymized version.</p>
 
-    <div id="statusBox" class="status ready">🎤 Ready to record</div>
+    <div class="voice-picker">
+      <label for="previewVoiceType">Preview Voice Type</label>
+      <select id="previewVoiceType">
+        <option value="balanced" selected>Balanced Clear (Default)</option>
+        <option value="warm">Warm Narrator</option>
+        <option value="bright">Bright Guide</option>
+        <option value="synthetic">Synthetic Neutral</option>
+        <option value="custom">Use Custom Slider Settings</option>
+      </select>
+      <p id="voiceHint" class="voice-hint">Natural cadence with clear consonants and anonymized timbre.</p>
+    </div>
+
+    <div id="statusBox" class="status ready">Ready to record.</div>
 
     <div class="timer" id="timer">0:00</div>
 
@@ -150,20 +246,20 @@
     </div>
 
     <div class="buttons">
-      <button class="btn record" id="recordBtn">⏺ Record</button>
-      <button class="btn stop" id="stopBtn" disabled>⏹ Stop</button>
+      <button class="btn record" id="recordBtn">Record</button>
+      <button class="btn stop" id="stopBtn" disabled>Stop</button>
     </div>
 
     <div class="playback-section" id="playbackSection">
       <p class="playback-label">Listen to your recording</p>
       <div class="playback-row">
-        <button class="btn small original" id="playOriginalBtn">🔊 Original</button>
-        <button class="btn small disguised" id="playDisguisedBtn">🎭 Disguised</button>
+        <button class="btn small original" id="playOriginalBtn">Play Original</button>
+        <button class="btn small disguised" id="playDisguisedBtn">Play Anonymized</button>
       </div>
     </div>
 
     <div class="buttons">
-      <button class="btn close" id="closeBtn">✕ Close</button>
+      <button class="btn close" id="closeBtn">Close</button>
     </div>
 
     <p class="tip">You can record multiple times. Each new recording replaces the last.</p>

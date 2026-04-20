@@ -6,11 +6,12 @@
 </head>
 <body>
   <div class="container">
-    <h1>🎙️ Voice Anonymizer</h1>
-    <p class="subtitle">Disguise your voice from humans. Stay clear to AI.</p>
+    <h1>Voice Anonymizer</h1>
+    <p class="subtitle">Clear speech, stronger identity masking.</p>
 
     <!-- Master Toggle -->
     <div class="toggle-row">
+      <span class="toggle-label">Anonymizer</span>
       <label class="switch">
         <input type="checkbox" id="enableToggle" checked>
         <span class="slider"></span>
@@ -22,12 +23,13 @@
     <div class="control-group">
       <label>Voice Style</label>
       <select id="voiceStyle">
-        <option value="natural1" selected>Person A — Deeper Natural</option>
-        <option value="natural2">Person B — Higher Natural</option>
-        <option value="natural3">Person C — Warm Tone</option>
-        <option value="natural4">Person D — Bright Tone</option>
+        <option value="balanced" selected>Balanced Clear (Default)</option>
+        <option value="warm">Warm Narrator</option>
+        <option value="bright">Bright Guide</option>
+        <option value="synthetic">Synthetic Neutral</option>
         <option value="custom">Custom (Advanced)</option>
       </select>
+      <p id="voiceDescription" class="voice-description">Natural cadence with clear consonants and anonymized timbre.</p>
     </div>
 
     <!-- Advanced Settings (hidden by default) -->
@@ -35,20 +37,20 @@
       <div class="advanced-header">Advanced Settings</div>
 
       <div class="control-group">
-        <label>Pitch Shift: <span id="pitchValue">0.82x</span></label>
-        <input type="range" id="pitchSlider" min="0.5" max="2.0" step="0.01" value="0.82">
+        <label>Pitch Shift: <span id="pitchValue">1.08x</span></label>
+        <input type="range" id="pitchSlider" min="0.5" max="2.0" step="0.01" value="1.08">
         <div class="range-labels"><span>Lower</span><span>Higher</span></div>
       </div>
 
       <div class="control-group">
-        <label>Formant Shift: <span id="formantValue">0.88x</span></label>
-        <input type="range" id="formantSlider" min="0.5" max="2.0" step="0.01" value="0.88">
+        <label>Formant Shift: <span id="formantValue">1.18x</span></label>
+        <input type="range" id="formantSlider" min="0.5" max="2.0" step="0.01" value="1.18">
         <div class="range-labels"><span>Darker</span><span>Brighter</span></div>
       </div>
 
       <div class="control-group">
-        <label>Noise Level: <span id="noiseValue">0.003</span></label>
-        <input type="range" id="noiseSlider" min="0" max="0.05" step="0.001" value="0.003">
+        <label>Noise Level: <span id="noiseValue">0.001</span></label>
+        <input type="range" id="noiseSlider" min="0" max="0.05" step="0.001" value="0.001">
         <div class="range-labels"><span>None</span><span>Heavy</span></div>
       </div>
 
@@ -65,7 +67,7 @@
 
     <!-- Preview Button -->
     <div class="button-row">
-      <button id="previewBtn" class="btn primary full">🎧 Preview My Voice</button>
+      <button id="previewBtn" class="btn primary full">Open Voice Preview</button>
     </div>
 
     <!-- Audio Level Meters -->
@@ -80,9 +82,7 @@
       </div>
     </div>
 
-    <p class="info">
-      ℹ️ Once enabled, all mic audio on every site is anonymized automatically.
-    </p>
+    <p class="info">When enabled, microphone audio is anonymized automatically on all sites.</p>
   </div>
 
   <script src="popup.js"></script>
