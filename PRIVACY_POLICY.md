@@ -30,9 +30,7 @@ Voice Anonymizer processes microphone audio locally in your browser to transform
 
 ## Contact
 
-- Support email: support@your-domain.example
-- Support page: https://your-domain.example/support
-- Privacy contact page: https://your-domain.example/privacy
+- Support email: yxx.tweaks@gmail.com
+- Support page: https://voice-anonymizer-website.vercel.app/
+- Privacy contact page: https://voice-anonymizer-website.vercel.app/privacy
 - Issue reporting: https://github.com/yxxTries/voice-anonymizer/issues
-
-Before publishing, replace the placeholder domain and email with your real support channels.

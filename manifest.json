@@ -31,9 +31,7 @@
     {
       "resources": [
         "injected.js",
-        "audio-processor.js",
-        "preview.html",
-        "preview.js"
+        "audio-processor.js"
       ],
       "matches": ["<all_urls>"]
     }

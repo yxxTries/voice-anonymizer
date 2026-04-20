@@ -64,6 +64,8 @@ const VOICES = {
 };
 
 const DEFAULT_VOICE_STYLE = 'balanced';
+const SAVE_DEBOUNCE_MS = 120;
+let saveSettingsTimer = null;
 
 function getPreset(style) {
   return VOICES[style] || VOICES[DEFAULT_VOICE_STYLE];
@@ -93,11 +95,8 @@ function getSettings() {
 }
 
 // ── Save & broadcast settings ──
-function saveSettings() {
-  const settings = getSettings();
-  chrome.storage.local.set({ voiceAnonymizer: settings });
-
-  chrome.tabs.query({}, (tabs) => {
+function broadcastSettings(settings) {
+  chrome.tabs.query({ url: ['http://*/*', 'https://*/*'] }, (tabs) => {
     tabs.forEach((tab) => {
       chrome.tabs.sendMessage(tab.id, {
         type: 'VOICE_ANON_SETTINGS',
@@ -105,6 +104,42 @@ function saveSettings() {
       }).catch(() => {});
     });
   });
+}
+
+function commitSettings(done) {
+  const settings = getSettings();
+  chrome.storage.local.get('voiceAnonymizer', (result) => {
+    const mergedSettings = {
+      ...(result.voiceAnonymizer || {}),
+      ...settings,
+    };
+
+    chrome.storage.local.set({ voiceAnonymizer: mergedSettings }, () => {
+      broadcastSettings(mergedSettings);
+      if (typeof done === 'function') {
+        done(mergedSettings);
+      }
+    });
+  });
+}
+
+function saveSettings(options, done) {
+  const immediate = options?.immediate === true;
+
+  if (saveSettingsTimer) {
+    clearTimeout(saveSettingsTimer);
+    saveSettingsTimer = null;
+  }
+
+  if (immediate) {
+    commitSettings(done);
+    return;
+  }
+
+  saveSettingsTimer = setTimeout(() => {
+    saveSettingsTimer = null;
+    commitSettings(done);
+  }, SAVE_DEBOUNCE_MS);
 }
 
 // ── Update display values ──
@@ -129,7 +164,7 @@ function applyVoice(name) {
   tremoloDepthSlider.value = v.tremoloDepth;
   updateDisplayValues();
   updateVoiceDescription();
-  saveSettings();
+  saveSettings({ immediate: true });
 }
 
 // ── Show/hide advanced panel ──
@@ -143,10 +178,11 @@ function toggleAdvanced() {
 
 // ── Preview: open extension preview page in new tab ──
 function startPreview() {
-  saveSettings();
-  chrome.tabs.create({
-    url: chrome.runtime.getURL('preview.html'),
-    active: true,
+  saveSettings({ immediate: true }, () => {
+    chrome.tabs.create({
+      url: chrome.runtime.getURL('preview.html'),
+      active: true,
+    });
   });
 }
 
@@ -155,7 +191,7 @@ enableToggle.addEventListener('change', () => {
   const on = enableToggle.checked;
   statusLabel.textContent = on ? 'ACTIVE' : 'OFF';
   statusLabel.className = `status ${on ? 'on' : 'off'}`;
-  saveSettings();
+  saveSettings({ immediate: true });
 });
 
 voiceStyle.addEventListener('change', () => {
@@ -164,7 +200,7 @@ voiceStyle.addEventListener('change', () => {
   if (voiceStyle.value !== 'custom') {
     applyVoice(voiceStyle.value);
   } else {
-    saveSettings();
+    saveSettings({ immediate: true });
   }
 });
 

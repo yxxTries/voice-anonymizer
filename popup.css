@@ -16,7 +16,7 @@ body {
 }
 
 h1 {
-  font-size: 18px;
+  font-size: 19px;
   line-height: 1.25;
   text-align: center;
   margin-bottom: 4px;
@@ -26,10 +26,10 @@ h1 {
 
 .subtitle {
   text-align: center;
-  font-size: 11px;
-  color: #a7a7a7;
+  font-size: 12px;
+  color: #bcbcbc;
   margin-bottom: 14px;
-  line-height: 1.35;
+  line-height: 1.4;
 }
 
 .toggle-row {
@@ -45,8 +45,8 @@ h1 {
 }
 
 .toggle-label {
-  font-size: 11px;
-  color: #c9c9c9;
+  font-size: 12px;
+  color: #d8d8d8;
   font-weight: 600;
 }
 
@@ -94,7 +94,7 @@ h1 {
 
 .status {
   font-weight: 700;
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 1px;
 }
 
@@ -107,10 +107,10 @@ h1 {
 
 .control-group label {
   display: block;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   margin-bottom: 4px;
-  color: #d7d7d7;
+  color: #e1e1e1;
 }
 
 .control-group label span {
@@ -125,7 +125,7 @@ h1 {
   border: 1px solid #343434;
   background: #111111;
   color: #f0f0f0;
-  font-size: 12px;
+  font-size: 13px;
   cursor: pointer;
 }
 
@@ -137,9 +137,9 @@ h1 {
 
 .voice-description {
   margin-top: 6px;
-  font-size: 10px;
-  color: #9a9a9a;
-  line-height: 1.35;
+  font-size: 11px;
+  color: #b3b3b3;
+  line-height: 1.4;
 }
 
 input[type="range"] {
@@ -164,8 +164,8 @@ input[type="range"]::-webkit-slider-thumb {
 .range-labels {
   display: flex;
   justify-content: space-between;
-  font-size: 9px;
-  color: #7e7e7e;
+  font-size: 10px;
+  color: #9a9a9a;
   margin-top: 2px;
 }
 
@@ -183,7 +183,7 @@ input[type="range"]::-webkit-slider-thumb {
 }
 
 .advanced-header {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   color: #f6f6f6;
   margin-bottom: 10px;
@@ -221,9 +221,9 @@ input[type="range"]::-webkit-slider-thumb {
 }
 
 .info {
-  font-size: 10px;
-  color: #8e8e8e;
+  font-size: 11px;
+  color: #adadad;
   text-align: center;
-  line-height: 1.35;
+  line-height: 1.4;
   margin-top: 8px;
 }

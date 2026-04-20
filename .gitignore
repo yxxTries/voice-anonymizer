@@ -1,0 +1,6 @@
+# Release packaging artifacts
+voice-anonymizer-chrome-upload.zip
+voice-anonymizer-chrome-upload/
+release_upload/
+CHROME_WEB_STORE_LISTING.md
+CWS_PRIVACY_ANSWERS.md
